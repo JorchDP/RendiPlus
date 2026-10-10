@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="img/icono.png">
+<title>RendiPlus</title>
+<meta name="description" content="RendiPlus revisa los componentes de tu PC, te da un puntaje de salud y aplica los ajustes que de verdad mejoran el rendimiento.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Diseño: la página es un instrumento de medición. Azul marino de noche, oro viejo solo
+   para lo que importa (el dial, el botón de descarga). Texto alineado a la izquierda,
+   columnas que se apilan en el teléfono. Un solo look oscuro, el de la app. */
+:root {
+  --noche: #0B1220;
+  --panel: #121B2E;
+  --panel-alto: #18233A;
+  --linea: #24304A;
+  --tinta: #EDF0F6;
+  --niebla: #9CA8BE;
+  --tenue: #66728A;
+  --oro: #C9A55C;
+  --oro-claro: #DDBD78;
+  --sobre-oro: #16120A;
+  --verde: #5FC79A;
+  --coral: #E5636B;
+  --display: "Barlow Semi Condensed", "Bahnschrift", "Arial Narrow", sans-serif;
+  --texto: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --ancho: 1120px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--noche);
+  color: var(--tinta);
+  font-family: var(--texto);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.marco { max-width: var(--ancho); margin-inline: auto; padding-inline: 20px; }
+a { color: var(--oro-claro); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.08; text-wrap: balance; margin: 0; letter-spacing: 0.005em; }
+h2 { font-size: clamp(1.9rem, 3.6vw, 2.6rem); }
+h3 { font-size: 1.35rem; }
+p { margin: 0; }
+.suave { color: var(--niebla); }
+
+/* Cabecera */
+.cabecera { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px; }
+.marca { display: flex; align-items: center; gap: 12px; color: var(--tinta); text-decoration: none; }
+.marca-r { width: 36px; height: 36px; border-radius: 9px; background: var(--oro); color: var(--sobre-oro);
+  display: grid; place-items: center; font: 700 1.3rem/1 var(--display); }
+.marca-nombre { font: 600 1.35rem/1 var(--display); }
+.nav { display: flex; gap: 22px; flex-wrap: wrap; }
+.nav a { color: var(--niebla); text-decoration: none; font-size: 0.95rem; }
+.nav a:hover { color: var(--tinta); }
+
+/* Portada */
+.portada { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 48px; align-items: center; padding-block: 48px 72px; }
+.portada h1 { font-size: clamp(2.6rem, 6.2vw, 4.6rem); font-weight: 700; letter-spacing: -0.005em; }
+.portada h1 span { display: block; color: var(--niebla); font-weight: 500; }
+.portada .bajada { font-size: 1.12rem; color: var(--niebla); max-width: 34rem; margin-top: 22px; }
+.acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 32px; }
+.boton { display: inline-flex; align-items: center; gap: 10px; background: var(--oro); color: var(--sobre-oro);
+  font: 600 1.02rem/1 var(--texto); padding: 15px 22px; border-radius: 10px; text-decoration: none;
+  transition: background 0.15s ease; }
+.boton:hover { background: var(--oro-claro); }
+.boton svg { width: 18px; height: 18px; }
+.enlace-sec { color: var(--tinta); font-weight: 500; }
+.version { margin-top: 16px; font-size: 0.88rem; color: var(--tenue); }
+
+/* El dial: la pieza que identifica a RendiPlus */
+.instrumento { background: var(--panel); border: 1px solid var(--linea); border-radius: 18px; padding: 26px 26px 22px; }
+.instrumento-titulo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.instrumento-titulo strong { font: 600 1.1rem/1 var(--display); }
+.instrumento-titulo span { font-size: 0.82rem; color: var(--tenue); }
+.dial { width: 100%; max-width: 330px; display: block; margin: 8px auto 0; }
+.dial .pista { fill: none; stroke: var(--linea); stroke-width: 18; }
+.dial .valor { fill: none; stroke: var(--oro); stroke-width: 18; stroke-dasharray: 460.77; stroke-dashoffset: 73.72; }
+.dial .marca { stroke: var(--tenue); stroke-width: 1.5; }
+.dial .marca-mayor { stroke: var(--niebla); stroke-width: 2; }
+.dial .cifra { fill: var(--tinta); font: 700 76px var(--display); font-variant-numeric: tabular-nums; }
+.dial .estado { fill: var(--verde); font: 600 19px var(--texto); }
+.lecturas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--linea); margin-top: 6px; padding-top: 16px; }
+.lectura { padding-inline: 4px; }
+.lectura + .lectura { border-left: 1px solid var(--linea); padding-left: 14px; }
+.lectura small { display: block; font-size: 0.78rem; color: var(--tenue); }
+.lectura b { font: 600 1.45rem/1.2 var(--display); font-variant-numeric: tabular-nums; }
+
+/* Secciones */
+.seccion { padding-block: 72px; border-top: 1px solid var(--linea); }
+.seccion-cabeza { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: end; margin-bottom: 40px; }
+.seccion-cabeza p { color: var(--niebla); max-width: 36rem; }
+.captura { margin: 0; }
+.captura img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--linea); }
+.captura figcaption { margin-top: 12px; font-size: 0.9rem; color: var(--tenue); }
+
+.funciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 56px; margin: 0; }
+.funcion { padding-block: 22px; border-top: 1px solid var(--linea); }
+.funcion dt { font: 600 1.35rem/1.2 var(--display); color: var(--oro-claro); }
+.funcion dd { margin: 8px 0 0; color: var(--niebla); max-width: 32rem; }
+
+.honesto { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; }
+.honesto ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.honesto li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; }
+.honesto li::before { content: ""; width: 14px; height: 2px; background: var(--coral); margin-top: 13px; }
+.honesto li b { display: block; font-weight: 600; }
+.honesto li span { color: var(--niebla); }
+
+.tabla-caja { overflow-x: auto; border: 1px solid var(--linea); border-radius: 14px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 13px 18px; border-bottom: 1px solid var(--linea); }
+thead th { font: 600 1.15rem var(--display); color: var(--oro-claro); }
+tbody th { font-weight: 500; color: var(--niebla); }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+.nota { margin-top: 12px; font-size: 0.88rem; color: var(--tenue); }
+
+.par { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 48px; align-items: center; }
+.par p + p { margin-top: 14px; }
+
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; counter-reset: paso; }
+.pasos li { counter-increment: paso; border-top: 2px solid var(--oro); padding-top: 18px; }
+.pasos li::before { content: counter(paso); display: block; font: 700 2.4rem/1 var(--display); color: var(--oro); margin-bottom: 10px; }
+.pasos b { display: block; font-size: 1.05rem; margin-bottom: 6px; }
+.pasos span { color: var(--niebla); }
+
+.preguntas { display: grid; gap: 0; max-width: 780px; }
+details { border-top: 1px solid var(--linea); padding-block: 18px; }
+details:last-child { border-bottom: 1px solid var(--linea); }
+summary { cursor: pointer; font: 600 1.18rem/1.3 var(--display); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--oro); font-size: 1.4rem; line-height: 1; }
+details[open] summary::after { content: "−"; }
+details p { margin-top: 10px; color: var(--niebla); max-width: 40rem; }
+
+.cierre { text-align: left; padding-block: 72px; border-top: 1px solid var(--linea); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; }
+.pie { padding-block: 28px 40px; border-top: 1px solid var(--linea); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.88rem; color: var(--tenue); }
+
+@media (max-width: 860px) {
+  .portada, .seccion-cabeza, .honesto, .par { grid-template-columns: minmax(0, 1fr); }
+  .portada { padding-block: 24px 56px; gap: 36px; }
+  .funciones { grid-template-columns: minmax(0, 1fr); }
+  .pasos { grid-template-columns: minmax(0, 1fr); }
+  .nav { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+
+</head>
+<body>
+<div class="marco">
+  <header class="cabecera">
+    <a class="marca" href="#inicio" aria-label="RendiPlus, inicio">
+      <span class="marca-r" aria-hidden="true">R</span>
+      <span class="marca-nombre">RendiPlus</span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#funciones">Funciones</a>
+      <a href="#seguridad">Seguridad</a>
+      <a href="#instalar">Instalar</a>
+      <a href="https://github.com/JorchDP/RendiPLus">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="portada">
+      <div>
+        <h1>Tu PC, medido y afinado. <span>Sin trucos ni promesas mágicas.</span></h1>
+        <p class="bajada">RendiPlus revisa tus componentes, te da un puntaje de salud y aplica los ajustes que de verdad mejoran el rendimiento. Cada cambio queda registrado y se puede deshacer.</p>
+        <div class="acciones">
+          <a class="boton" href="https://github.com/JorchDP/RendiPLus/releases/latest/download/RendiPlus-Windows.zip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+            Descargar para Windows
+          </a>
+          <a class="enlace-sec" href="https://github.com/JorchDP/RendiPLus/releases/latest/download/RendiPlus-Mac.zip">Versión para Mac</a>
+        </div>
+        <p class="version">Versión 1.1, gratis. Windows 10 y 11, macOS.</p>
+      </div>
+
+      <div class="instrumento" aria-label="Ejemplo del puntaje de salud de RendiPlus">
+        <div class="instrumento-titulo"><strong>Salud del equipo</strong><span>Ryzen 5 5600T, RTX 3050</span></div>
+        <svg class="dial" viewBox="0 0 300 262" role="img" aria-label="Puntaje 84 de 100, estado Bien">
+          <line x1="42.6" y1="212.0" x2="34.8" y2="216.5" class="marca-mayor"/><line x1="26.7" y1="163.0" x2="21.7" y2="163.5" class="marca"/><line x1="32.1" y1="111.7" x2="27.3" y2="110.1" class="marca"/><line x1="57.9" y1="67.0" x2="54.1" y2="63.7" class="marca"/><line x1="99.6" y1="36.7" x2="97.5" y2="32.2" class="marca"/><line x1="150.0" y1="26.0" x2="150.0" y2="17.0" class="marca-mayor"/><line x1="200.4" y1="36.7" x2="202.5" y2="32.2" class="marca"/><line x1="242.1" y1="67.0" x2="245.9" y2="63.7" class="marca"/><line x1="267.9" y1="111.7" x2="272.7" y2="110.1" class="marca"/><line x1="273.3" y1="163.0" x2="278.3" y2="163.5" class="marca"/><line x1="257.4" y1="212.0" x2="265.2" y2="216.5" class="marca-mayor"/>
+          <path class="pista" d="M54.74 205.00 A110 110 0 1 1 245.26 205.00"/>
+          <path class="valor" id="arco-valor" d="M54.74 205.00 A110 110 0 1 1 245.26 205.00"/>
+          <text class="cifra" id="cifra" x="150" y="168" text-anchor="middle">84</text>
+          <text class="estado" x="150" y="204" text-anchor="middle">Bien</text>
+        </svg>
+        <div class="lecturas">
+          <div class="lectura"><small>Procesador</small><b>6 %</b></div>
+          <div class="lectura"><small>Memoria</small><b>50 %</b></div>
+          <div class="lectura"><small>Gráficos</small><b>30 °C</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion">
+      <figure class="captura">
+        <img src="img/panel.jpg" width="1320" height="840" alt="Panel de RendiPlus con el dial de salud, el uso de procesador y memoria en vivo, las apps que más memoria usan y los discos">
+        <figcaption>El Panel: uso en vivo, salud del equipo, discos y las apps que más memoria consumen.</figcaption>
+      </figure>
+    </section>
+
+    <section class="seccion" id="funciones">
+      <div class="seccion-cabeza">
+        <h2>Todo lo que tu PC necesita, en un solo lugar</h2>
+        <p>Cada sección hace una cosa y te dice qué cambió. Nada se aplica sin que lo pidas.</p>
+      </div>
+      <dl class="funciones">
+        <div class="funcion"><dt>Panel</dt><dd>Uso de procesador, memoria y GPU en vivo, temperaturas y un puntaje de salud de 0 a 100.</dd></div>
+        <div class="funcion"><dt>Limpieza</dt><dd>Temporales, cachés de navegadores, papelera y descargas viejas de Windows Update. Solo toca carpetas seguras y nunca tus documentos.</dd></div>
+        <div class="funcion"><dt>Inicio y procesos</dt><dd>Decide qué programas arrancan con tu PC y cierra los que consumen de más, igual que el Administrador de tareas.</dd></div>
+        <div class="funcion"><dt>Perfiles</dt><dd>Rendimiento, Equilibrado y Ahorro. Cambian el modo de energía, el Modo de juego y cierran las apps que elijas antes de jugar.</dd></div>
+        <div class="funcion"><dt>Recomendaciones</dt><dd>Revisa tu hardware y te dice qué mejorar primero: RAM en un solo canal, monitor a menos Hz de los que soporta, drivers viejos.</dd></div>
+        <div class="funcion"><dt>Historial</dt><dd>Registra cada cambio. Puedes deshacer uno por uno o volver todo a como estaba con un clic.</dd></div>
+      </dl>
+    </section>
+
+    <section class="seccion">
+      <div class="honesto">
+        <div>
+          <h2>Lo que RendiPlus no hace</h2>
+          <p class="suave" style="margin-top:16px">Muchos optimizadores prometen el doble de FPS apagando servicios a ciegas. RendiPlus solo aplica ajustes que tienen un efecto real y medible.</p>
+        </div>
+        <ul>
+          <li><div><b>No borra tus archivos personales.</b><span>Los archivos grandes se muestran para que decidas tú.</span></div></li>
+          <li><div><b>No apaga servicios de Windows.</b><span>Desactivarlos al azar suele romper funciones y casi nunca da rendimiento.</span></div></li>
+          <li><div><b>No "limpia la RAM".</b><span>Windows ya administra la memoria. Vaciarla a la fuerza hace que todo vuelva a cargar más lento.</span></div></li>
+          <li><div><b>No instala un antivirus propio.</b><span>Usa Microsoft Defender, que ya viene con Windows y está entre los mejor evaluados.</span></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="seccion">
+      <div class="seccion-cabeza">
+        <h2>Calidad gráfica pensada para tu GPU</h2>
+        <p>RendiPlus identifica tu tarjeta gráfica y tu pantalla, y te sugiere desde dónde partir en el menú de gráficos de cada juego.</p>
+      </div>
+      <div class="tabla-caja">
+        <table>
+          <thead><tr><th scope="col"><span class="suave" style="font:500 0.9rem var(--texto)">RTX 3050, 1920 x 1080, 144 Hz</span></th><th scope="col">Rendimiento</th><th scope="col">Equilibrado</th><th scope="col">Calidad</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Pensado para</th><td>Valorant, CS2, Fortnite</td><td>La mayoría de los juegos</td><td>Mundos abiertos</td></tr>
+            <tr><th scope="row">Calidad general</th><td>Medio</td><td>Alto</td><td>Muy alto</td></tr>
+            <tr><th scope="row">Escalado</th><td>DLSS Rendimiento</td><td>DLSS Calidad</td><td>DLSS Calidad</td></tr>
+            <tr><th scope="row">Texturas</th><td>Alto</td><td>Alto</td><td>Alto</td></tr>
+            <tr><th scope="row">Sombras</th><td>Bajo</td><td>Medio</td><td>Muy alto</td></tr>
+            <tr><th scope="row">FPS objetivo</th><td>144 o más</td><td>60 a 120</td><td>45 a 60</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="nota">Ejemplo real de lo que muestra RendiPlus para una RTX 3050 con 6 GB de VRAM. Tu PC verá sus propios valores.</p>
+    </section>
+
+    <section class="seccion" id="seguridad">
+      <div class="par">
+        <figure class="captura">
+          <img src="img/seguridad.jpg" width="1320" height="840" loading="lazy" alt="Página Seguridad de RendiPlus con el estado de Microsoft Defender, las firmas, el último análisis y el firewall">
+        </figure>
+        <div>
+          <h2>Seguridad sin otro antivirus</h2>
+          <p class="suave" style="margin-top:16px">La sección Seguridad controla Microsoft Defender sin salir de RendiPlus: protección en tiempo real, base de amenazas, firewall y amenazas detectadas.</p>
+          <p class="suave">Desde ahí lanzas un análisis rápido, completo o de una carpeta, y actualizas las firmas con un clic. En Mac revisa XProtect, Gatekeeper, el firewall y FileVault.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion" id="instalar">
+      <div class="seccion-cabeza">
+        <h2>Instalar toma un minuto</h2>
+        <p>No necesitas tener Python ni ningún otro programa instalado.</p>
+      </div>
+      <ol class="pasos">
+        <li><b>Descarga RendiPlus</b><span>Para Windows es un archivo .zip con la carpeta del programa.</span></li>
+        <li><b>Descomprime y abre</b><span>Extrae la carpeta donde quieras y abre RendiPlus.exe.</span></li>
+        <li><b>Si Windows te avisa</b><span>Si aparece "Windows protegió su PC", haz clic en Más información y luego en Ejecutar de todas formas.</span></li>
+      </ol>
+    </section>
+
+    <section class="seccion">
+      <h2 style="margin-bottom:28px">Preguntas frecuentes</h2>
+      <div class="preguntas">
+        <details><summary>¿Es gratis?</summary><p>Sí. Puedes descargar y usar RendiPlus gratis en tus propios equipos.</p></details>
+        <details><summary>¿Por qué Windows dice "Windows protegió su PC"?</summary><p>Windows muestra ese aviso con los programas nuevos que todavía no tienen firma digital. Es un aviso de que no conoce al editor, no de que haya un virus. El código de RendiPlus es público en GitHub para que cualquiera pueda revisarlo.</p></details>
+        <details><summary>¿Puedo deshacer los cambios?</summary><p>Sí. Los perfiles, ajustes y programas de inicio quedan en el Historial, y puedes deshacerlos uno por uno o todos juntos. Lo único que no se puede recuperar es lo que borra la Limpieza, por eso te pide confirmación antes.</p></details>
+        <details><summary>¿Cómo veo la temperatura del procesador?</summary><p>Windows no la entrega por sí solo. Instala LibreHardwareMonitor (gratis), ábrelo como administrador y RendiPlus la leerá automáticamente.</p></details>
+        <details><summary>¿Funciona en Mac?</summary><p>Sí: diagnóstico, limpieza, programas de inicio, seguridad y recomendaciones. Algunas opciones, como la bandeja del sistema y los planes de energía, son solo de Windows.</p></details>
+      </div>
+    </section>
+
+    <section class="cierre">
+      <h2>Mide tu PC hoy.</h2>
+      <a class="boton" href="https://github.com/JorchDP/RendiPLus/releases/latest/download/RendiPlus-Windows.zip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+        Descargar para Windows
+      </a>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <span>© 2026 JorchDP. Todos los derechos reservados.</span>
+    <a href="https://github.com/JorchDP/RendiPLus">Código en GitHub</a>
+  </footer>
+</div>
+
+<script>
+// Al cargar, la aguja sube desde cero hasta el puntaje. Sin JavaScript se ve el valor final.
+(function () {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var arco = document.getElementById("arco-valor");
+  var cifra = document.getElementById("cifra");
+  var largo = 460.77, meta = 84, duracion = 1100, inicio = null;
+  function paso(t) {
+    if (inicio === null) inicio = t;
+    var avance = Math.min(1, (t - inicio) / duracion);
+    var suave = 1 - Math.pow(1 - avance, 3);
+    var valor = meta * suave;
+    arco.style.strokeDashoffset = largo * (1 - valor / 100);
+    cifra.textContent = Math.round(valor);
+    if (avance < 1) requestAnimationFrame(paso);
+  }
+  arco.style.strokeDashoffset = largo;
+  cifra.textContent = "0";
+  requestAnimationFrame(paso);
+})();
+</script>
+</body>
+</html>

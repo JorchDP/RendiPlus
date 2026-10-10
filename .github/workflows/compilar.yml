@@ -1,0 +1,63 @@
+# Compila RendiPlus para Windows y Mac en los servidores de GitHub.
+# - Se ejecuta a mano desde la pestaña "Actions", o
+# - automáticamente al crear una etiqueta de versión (por ejemplo v1.1), y en ese caso
+#   publica los instaladores en la sección "Releases" del repositorio.
+name: Compilar RendiPlus
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt pyinstaller
+      # Se arma como carpeta (abre mucho más rápido que un .exe de un solo archivo) y se comprime en .zip
+      - run: >
+          pyinstaller --noconfirm --onedir --windowed --name RendiPlus
+          --icon recursos/icono.ico --add-data "recursos;recursos"
+          --collect-data customtkinter --hidden-import pystray._win32 app.py
+      - run: Compress-Archive -Path dist/RendiPlus -DestinationPath dist/RendiPlus-Windows.zip
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RendiPlus-Windows
+          path: dist/RendiPlus-Windows.zip
+
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt pyinstaller pillow
+      - run: >
+          pyinstaller --noconfirm --windowed --name RendiPlus
+          --icon recursos/icono.png --add-data "recursos:recursos"
+          --collect-data customtkinter app.py
+      - run: ditto -c -k --keepParent dist/RendiPlus.app dist/RendiPlus-Mac.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RendiPlus-Mac
+          path: dist/RendiPlus-Mac.zip
+
+  publicar:
+    needs: [windows, mac]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            RendiPlus-Windows/RendiPlus-Windows.zip
+            RendiPlus-Mac/RendiPlus-Mac.zip

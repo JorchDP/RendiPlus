@@ -1,0 +1,9 @@
+customtkinter>=5.2
+psutil>=5.9
+# Uso, VRAM y temperatura en vivo para GPUs NVIDIA (no aplica en Mac)
+nvidia-ml-py ; sys_platform != "darwin"
+# Ícono en la bandeja del sistema (Windows)
+pystray>=0.19 ; sys_platform == "win32"
+pillow>=10 ; sys_platform == "win32"
+# Lectura de temperaturas desde LibreHardwareMonitor (Windows)
+pywin32 ; sys_platform == "win32"

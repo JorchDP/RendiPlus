@@ -1,0 +1,27 @@
+RendiPlus
+Copyright (c) 2026 JorchDP. Todos los derechos reservados.
+
+Este software y su código fuente son propiedad de su autor.
+
+SE PERMITE
+  - Descargar y usar la aplicación RendiPlus, gratis, en tus propios equipos.
+  - Leer el código fuente publicado en este repositorio.
+
+NO SE PERMITE, sin autorización previa y por escrito del autor:
+  - Copiar, modificar o crear obras derivadas del código fuente.
+  - Redistribuir, publicar, sublicenciar o vender la aplicación o su código,
+    completos o en parte, incluidas versiones modificadas.
+  - Usar el nombre "RendiPlus" o su logotipo para otros productos.
+
+SIN GARANTÍA
+La aplicación se entrega "tal cual", sin garantías de ningún tipo. El autor no
+se hace responsable de daños o pérdidas derivados de su uso. RendiPlus guarda
+un historial de los cambios que realiza para que puedan deshacerse, pero el uso
+es bajo responsabilidad de cada persona.
+
+COMPONENTES DE TERCEROS
+RendiPlus usa bibliotecas de terceros que mantienen sus propias licencias.
+Revisa el archivo LICENCIAS_TERCEROS.md.
+
+Para permisos o consultas, contacta al autor a través de su perfil de GitHub:
+https://github.com/JorchDP
