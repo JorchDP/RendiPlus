@@ -56,7 +56,13 @@ SCRIPT_WINDOWS = "; ".join([
     "$ErrorActionPreference = 'SilentlyContinue'",
     "$r = [ordered]@{}",
     "$r.mem = @(Get-CimInstance Win32_PhysicalMemory | "
-    "Select-Object Capacity, Speed, ConfiguredClockSpeed, SMBIOSMemoryType)",
+    "Select-Object Capacity, Speed, ConfiguredClockSpeed, SMBIOSMemoryType, FormFactor, "
+    "Manufacturer, PartNumber, DeviceLocator)",
+    "$r.ranuras = @(Get-CimInstance Win32_PhysicalMemoryArray | Where-Object Use -eq 3 | "
+    "Select-Object MemoryDevices, MaxCapacity, MaxCapacityEx)",
+    "$r.placa = Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product",
+    "$r.equipo = Get-CimInstance Win32_ComputerSystem | Select-Object Manufacturer, Model",
+    "$r.chasis = @((Get-CimInstance Win32_SystemEnclosure).ChassisTypes)",
     "$r.gpu = @(Get-CimInstance Win32_VideoController | Select-Object Name, AdapterRAM, "
     "DriverVersion, @{n='Fecha';e={$_.DriverDate.ToString('yyyy-MM-dd')}})",
     "$r.discos = @(Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, BusType, Size)",
@@ -94,14 +100,56 @@ def info_sistema():
         bateria = psutil.sensors_battery()
     except Exception:
         pass
+    portatil = bateria is not None
 
-    return {
-        "Sistema": nombre,
-        "Equipo": platform.node(),
-        "Tipo": "Portátil" if bateria is not None else "Escritorio",
-        "_portatil": bateria is not None,
-        "_nombre_corto": nombre.split(" (")[0],
-    }
+    datos = {"Sistema": nombre, "Equipo": platform.node()}
+    if SISTEMA == "Windows":
+        info = datos_windows()
+        chasis = [c for c in como_lista(info.get("chasis")) if isinstance(c, int)]
+        if any(c in CHASIS_PORTATIL for c in chasis):
+            portatil = True
+        elif any(c in CHASIS_ESCRITORIO for c in chasis):
+            portatil = False
+        equipo = info.get("equipo") or {}
+        modelo = texto_util(equipo.get("Model"))
+        fabricante = texto_util(equipo.get("Manufacturer"))
+        if modelo:
+            if fabricante and not modelo.lower().startswith(fabricante.lower().split()[0]):
+                modelo = fabricante + " " + modelo
+            datos["Modelo"] = modelo
+            datos["_modelo"] = modelo
+        placa = info.get("placa") or {}
+        nombre_placa = texto_util(placa.get("Product"))
+        if nombre_placa:
+            marca_placa = texto_util(placa.get("Manufacturer"))
+            if marca_placa and marca_placa.lower() not in nombre_placa.lower():
+                nombre_placa = marca_placa + " " + nombre_placa
+            datos["Placa madre"] = nombre_placa
+            datos["_placa"] = nombre_placa
+    elif SISTEMA == "Darwin":
+        modelo = ejecutar(["sysctl", "-n", "hw.model"])
+        if modelo:
+            datos["_modelo"] = modelo
+
+    datos["Tipo"] = "Portátil" if portatil else "Escritorio"
+    datos["_portatil"] = portatil
+    datos["_nombre_corto"] = nombre.split(" (")[0]
+    return datos
+
+
+# Tipos de gabinete que informa la BIOS (SMBIOS)
+CHASIS_PORTATIL = {8, 9, 10, 11, 14, 30, 31, 32}
+CHASIS_ESCRITORIO = {3, 4, 5, 6, 7, 13, 15, 16, 35, 36}
+TEXTOS_DE_RELLENO = ("to be filled", "system product name", "system manufacturer", "default string",
+                     "not applicable", "o.e.m", "oem", "none", "base board")
+
+
+def texto_util(texto):
+    """Muchas placas genéricas dicen "To be filled by O.E.M." o "System Product Name": eso no sirve."""
+    texto = " ".join(str(texto or "").split())
+    if not texto or any(relleno in texto.lower() for relleno in TEXTOS_DE_RELLENO):
+        return ""
+    return texto
 
 
 # ============================================================
@@ -174,7 +222,9 @@ def info_cpu():
 #  Memoria RAM
 # ============================================================
 
-TIPOS_RAM = {20: "DDR", 21: "DDR2", 24: "DDR3", 26: "DDR4", 34: "DDR5", 35: "LPDDR5"}
+TIPOS_RAM = {20: "DDR", 21: "DDR2", 24: "DDR3", 26: "DDR4", 27: "LPDDR", 28: "LPDDR2", 29: "LPDDR3",
+             30: "LPDDR4", 34: "DDR5", 35: "LPDDR5"}
+FORMATOS_RAM = {8: "DIMM", 12: "SO-DIMM"}
 
 
 def info_ram():
@@ -201,6 +251,21 @@ def info_ram():
             datos["_tipo"] = tipo
             datos["_velocidad"] = int(velocidad or 0)
             datos["_velocidad_nominal"] = int(modulos[0].get("Speed") or 0)
+            datos["_formato"] = FORMATOS_RAM.get(modulos[0].get("FormFactor"), "")
+            datos["_fabricante"] = texto_util(modulos[0].get("Manufacturer"))
+            datos["_parte"] = texto_util(modulos[0].get("PartNumber"))
+
+            # Ranuras de la placa y máximo que soporta (lo informa la BIOS)
+            ranuras = 0
+            maximo_kb = 0
+            for arreglo in como_lista(datos_windows().get("ranuras")):
+                ranuras = ranuras + int(arreglo.get("MemoryDevices") or 0)
+                maximo_kb = maximo_kb + int(arreglo.get("MaxCapacityEx") or arreglo.get("MaxCapacity") or 0)
+            if ranuras >= len(modulos):
+                datos["_ranuras"] = ranuras
+                datos["Ranuras"] = f"{len(modulos)} de {ranuras} en uso"
+            if maximo_kb:
+                datos["_maximo_gb"] = round(maximo_kb / 1024 ** 2)
 
     elif SISTEMA == "Darwin":
         texto = ejecutar(["system_profiler", "SPMemoryDataType", "-json"])
@@ -212,6 +277,7 @@ def info_ram():
             pass
         if platform.machine() == "arm64":
             datos["Arquitectura"] = "Memoria unificada"
+            datos["_soldada"] = True
     return datos
 
 

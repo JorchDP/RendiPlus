@@ -114,8 +114,12 @@ def construir(marco, app):
     lista_discos.pack(fill="x", padx=20, pady=(0, 6))
     ctk.CTkLabel(lista_discos, text="Leyendo discos...", font=tema.fuente(12),
                  text_color=tema.TEXTO_TENUE).pack(anchor="w")
-    tema.boton(discos, "Liberar espacio", lambda: app["ir_a"]("limpieza"), "fantasma",
-               alto=32).pack(anchor="w", padx=12, pady=(0, 14))
+    enlaces_discos = ctk.CTkFrame(discos, fg_color="transparent", height=1)
+    enlaces_discos.pack(anchor="w", padx=12, pady=(0, 14))
+    tema.boton(enlaces_discos, "Liberar espacio", lambda: app["ir_a"]("limpieza"), "fantasma",
+               alto=32).pack(side="left")
+    tema.boton(enlaces_discos, "Ver qué ocupa espacio", lambda: app["ir_a"]("programas"), "fantasma",
+               alto=32).pack(side="left", padx=(6, 0))
 
     # ------------------------------------------------------------
     #  Especificaciones

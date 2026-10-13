@@ -15,7 +15,7 @@ import customtkinter as ctk
 from motores.sistema import leer_config
 
 NOMBRE_APP = "RendiPlus"
-VERSION = "1.1"
+VERSION = "1.2"
 
 # ============================================================
 #  Temas de color. El elegido se guarda en la configuración y se aplica al abrir la app.
@@ -223,6 +223,7 @@ def pagina_con_scroll(padre):
         scrollbar_button_color=LINEA, scrollbar_button_hover_color=TEXTO_TENUE,
     )
     contenido.pack(fill="both", expand=True)
+    padre.desplazable = contenido
     return contenido
 
 

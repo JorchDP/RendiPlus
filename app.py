@@ -13,12 +13,7 @@ import threading
 import time
 import traceback
 
-try:
-    import customtkinter as ctk
-except ModuleNotFoundError:
-    print("Falta la dependencia 'customtkinter'. Instálala con: py -m pip install -r requirements.txt")
-    print("En macOS: python3 -m pip install -r requirements.txt")
-    sys.exit(1)
+import customtkinter as ctk
 
 from motores import escritorio, hardware, perfiles, recomendaciones, sistema, historial
 
@@ -33,8 +28,9 @@ if not escritorio.instancia_unica(lambda: cola.put(("mostrar", None))):
     sys.exit(0)   # ya estaba abierta: le pedimos que se muestre y salimos
 
 from interfaz import tema  # noqa: E402  (se importa después: lee el tema guardado)
-from interfaz import (pagina_panel, pagina_limpieza, pagina_inicio, pagina_perfiles,  # noqa: E402
-                      pagina_seguridad, pagina_recomendaciones, pagina_historial, pagina_configuracion)
+from interfaz import (pagina_panel, pagina_limpieza, pagina_programas, pagina_inicio,  # noqa: E402
+                      pagina_perfiles, pagina_seguridad, pagina_recomendaciones, pagina_mejoras,
+                      pagina_historial, pagina_configuracion)
 
 INICIO_MINIMIZADO = "--minimizado" in sys.argv
 
@@ -54,7 +50,7 @@ ventana = ctk.CTk(fg_color=tema.FONDO)
 # dibuje la ventana más lento.
 ventana.title(tema.NOMBRE_APP)
 ventana.geometry("1320x840")
-ventana.minsize(1120, 700)
+ventana.minsize(1120, 720)
 tema.elegir_fuentes()
 
 
@@ -147,7 +143,7 @@ principal.pack(side="left", fill="both", expand=True)
 
 # --- Marca ---
 marca = ctk.CTkFrame(lateral, fg_color="transparent", height=1)
-marca.pack(fill="x", padx=22, pady=(26, 30))
+marca.pack(fill="x", padx=22, pady=(24, 24))
 ctk.CTkLabel(marca, text="R", width=38, height=38, corner_radius=10, fg_color=tema.ORO,
              text_color=tema.TEXTO_SOBRE_ORO, font=tema.fuente(22, True, titulo=True)).pack(side="left")
 nombre_marca = ctk.CTkFrame(marca, fg_color="transparent", height=1)
@@ -161,10 +157,12 @@ ctk.CTkLabel(nombre_marca, text="Optimizador de PC", font=tema.fuente(11),
 PAGINAS = [
     ("panel", "Panel", pagina_panel),
     ("limpieza", "Limpieza", pagina_limpieza),
+    ("programas", "Programas y discos", pagina_programas),
     ("inicio", "Inicio y procesos", pagina_inicio),
     ("perfiles", "Perfiles", pagina_perfiles),
     ("seguridad", "Seguridad", pagina_seguridad),
     ("recomendaciones", "Recomendaciones", pagina_recomendaciones),
+    ("mejoras", "Mejoras de hardware", pagina_mejoras),
     ("historial", "Historial", pagina_historial),
     ("configuracion", "Configuración", pagina_configuracion),
 ]
@@ -175,12 +173,12 @@ paginas_creadas = {}
 def crear_item_menu(clave, texto):
     if clave == "configuracion":
         tema.separador(lateral).pack(fill="x", padx=24, pady=10)
-    fila = ctk.CTkFrame(lateral, fg_color="transparent", height=44)
+    fila = ctk.CTkFrame(lateral, fg_color="transparent", height=38)
     fila.pack(fill="x", padx=(10, 14), pady=1)
     indicador = ctk.CTkFrame(fila, width=3, height=22, fg_color=tema.LATERAL, corner_radius=2)
     indicador.pack(side="left", padx=(0, 7))
     boton = ctk.CTkButton(
-        fila, text=texto, anchor="w", height=40, corner_radius=8, fg_color="transparent",
+        fila, text=texto, anchor="w", height=36, corner_radius=8, fg_color="transparent",
         hover_color=tema.SUPERFICIE, text_color=tema.TEXTO_SUAVE, font=tema.fuente(14),
         command=lambda: ir_a(clave),
     )

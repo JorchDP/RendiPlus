@@ -46,10 +46,12 @@ Usa el botón **Abrir como administrador** del menú lateral.
 |---|---|
 | Panel | Uso en vivo de CPU, RAM y GPU, puntaje de salud, discos y especificaciones |
 | Limpieza | Temporales, cachés de navegadores y apps, papelera, Windows Update, archivos grandes |
+| Programas y discos | Qué hay instalado en cada disco y cuánto ocupa (programas, Steam, Epic, Xbox). Desinstala con el desinstalador oficial de cada uno |
 | Inicio y procesos | Activa o desactiva programas que arrancan solos; cierra apps pesadas |
 | Perfiles | Rendimiento, Equilibrado y Ahorro: plan de energía, modo de juego, transparencias y apps en segundo plano |
 | Seguridad | Controla Microsoft Defender: estado, análisis, firmas, amenazas y firewall. En Mac, XProtect y compañía |
 | Recomendaciones | Revisa tu hardware, configuración y seguridad, y sugiere la calidad gráfica para tus juegos |
+| Mejoras de hardware | Qué componente frena al equipo, qué comprarle (RAM, SSD, procesador, GPU, monitor) y qué es compatible con tu placa |
 | Historial | Registro de cada cambio, con opción de deshacerlo o restaurar todo |
 | Configuración | Temas (Marino, Grafito, Claro), abrir con Windows, bandeja del sistema y sensores |
 
@@ -71,6 +73,8 @@ RendiPlus/
 │   ├── inicio.py           Programas de inicio y procesos
 │   ├── perfiles.py         Perfiles y ajustes de Windows / Mac
 │   ├── recomendaciones.py  Reglas, puntaje de salud y calidad gráfica sugerida
+│   ├── mejoras.py          Equilibrio del equipo y mejoras de hardware compatibles
+│   ├── programas.py        Programas y juegos instalados por disco, tamaño y desinstalación
 │   ├── seguridad.py        Microsoft Defender, firewall y protección de macOS
 │   ├── escritorio.py       Bandeja del sistema, inicio con Windows, una sola instancia
 │   └── historial.py        Registro de cambios y deshacer

@@ -34,10 +34,11 @@ NIVELES_GPU = [
     ("rtx 5060", 3), ("rtx 4060", 3), ("rtx 3060", 3), ("rtx 2080", 3), ("rtx 2070", 3),
     ("rx 9060", 3), ("rx 7600", 3), ("rx 6750", 3), ("rx 6700", 3), ("rx 6650", 3), ("rx 6600", 3),
     ("rx 5700", 3), ("arc b580", 3), ("arc b570", 3), ("arc a770", 3), ("arc a750", 3),
+    ("rtx 4050", 3), ("rtx 5050", 3),
     ("rtx 2060", 2), ("rtx 3050", 2), ("gtx 1660", 2), ("gtx 1080", 2), ("gtx 1070", 2),
     ("rx 5600", 2), ("rx 5500", 2), ("arc a580", 2),
     ("gtx 1650", 1), ("gtx 1060", 1), ("rx 590", 1), ("rx 580", 1), ("rx 570", 1), ("rx 6500", 1),
-    ("arc a380", 1), ("gtx 1050", 1), ("gtx 9", 1), ("gtx 7", 0),
+    ("arc a380", 1), ("rtx 2050", 1), ("gtx 1050", 1), ("gtx 9", 1), ("gtx 7", 0),
 ]
 INTEGRADAS = ["uhd", "iris", "hd graphics", "radeon graphics", "radeon(tm) graphics", "vega",
               "intel(r) graphics", "arc graphics", "780m", "760m", "680m", "890m"]
@@ -264,7 +265,8 @@ def analizar(datos_pc, uso=None):
                                      "a ese disco es la mejora más notoria que puedes hacer, sin gastar nada.")
             else:
                 detalle = detalle + "Un SSD es la mejora más notoria y barata que le puedes hacer a tu PC."
-            agregar("alta", "Almacenamiento", f"Windows está en un disco duro (unidad {letra}:)", detalle)
+            agregar("alta", "Almacenamiento", f"Windows está en un disco duro (unidad {letra}:)", detalle,
+                    {"tipo": "pagina", "pagina": "mejoras", "texto": "Ver qué comprar"} if not ssds else None)
         elif "SSD" in tipo_sistema:
             positivos.append(f"Windows está instalado en un {tipo_sistema}.")
 
@@ -299,10 +301,12 @@ def analizar(datos_pc, uso=None):
     total = ram.get("_total_gb") or 0
     if total and total < 7.5:
         agregar("alta", "Memoria", f"Solo tienes {total:.0f} GB de RAM",
-                "Con menos de 8 GB, Windows y el navegador ya ocupan casi todo. Subir a 16 GB es una mejora enorme.")
+                "Con menos de 8 GB, Windows y el navegador ya ocupan casi todo. Subir a 16 GB es una mejora enorme.",
+                {"tipo": "pagina", "pagina": "mejoras", "texto": "Ver qué comprar"})
     elif total and total < 15:
         agregar("media", "Memoria", f"Tienes {total:.0f} GB de RAM",
-                "Alcanza para lo básico, pero 16 GB es lo recomendado hoy para jugar sin tirones.")
+                "Alcanza para lo básico, pero 16 GB es lo recomendado hoy para jugar sin tirones.",
+                {"tipo": "pagina", "pagina": "mejoras", "texto": "Ver qué comprar"})
     elif total:
         positivos.append(f"{total:.0f} GB de RAM: suficiente para jugar y tener otras apps abiertas.")
 
@@ -310,7 +314,8 @@ def analizar(datos_pc, uso=None):
     if len(modulos) == 1:
         agregar("alta", "Memoria", "La RAM funciona en un solo canal",
                 "Tienes un solo módulo. Agregar otro igual activa el doble canal, que duplica el ancho de "
-                "banda de la memoria y sube bastante los FPS, sobre todo en juegos que exigen al procesador.")
+                "banda de la memoria y sube bastante los FPS, sobre todo en juegos que exigen al procesador.",
+                {"tipo": "pagina", "pagina": "mejoras", "texto": "Ver qué comprar"})
     elif len(modulos) >= 2 and len(set(modulos)) > 1:
         tamanos = " + ".join(f"{m} GB" for m in modulos)
         agregar("baja", "Memoria", "Módulos de RAM de distinto tamaño",

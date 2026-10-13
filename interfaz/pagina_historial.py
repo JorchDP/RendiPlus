@@ -10,7 +10,7 @@ from interfaz import tema
 from motores import historial, sistema
 
 COLOR_TIPO = {"Perfil": tema.ORO, "Ajuste": tema.ACERO, "Inicio": tema.ACERO, "Limpieza": tema.VERDE,
-              "Procesos": tema.TEXTO_SUAVE, "Sistema": tema.VERDE}
+              "Procesos": tema.TEXTO_SUAVE, "Sistema": tema.VERDE, "Programas": tema.CORAL}
 
 
 def construir(marco, app):

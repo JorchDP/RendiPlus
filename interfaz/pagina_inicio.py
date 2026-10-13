@@ -38,7 +38,7 @@ def construir(marco, app):
                               text_color=tema.TEXTO_SUAVE, font=tema.fuente(15, True), height=30,
                               anchor="w", width=10, command=lambda c=clave: mostrar_vista(c))
         boton.pack(anchor="w")
-        linea = ctk.CTkFrame(bloque, height=2, fg_color=tema.FONDO, corner_radius=1)
+        linea = ctk.CTkFrame(bloque, height=2, width=1, fg_color=tema.FONDO, corner_radius=1)
         linea.pack(fill="x", padx=4)
         botones_vista[clave] = (boton, linea)
     tema.separador(cuerpo).pack(fill="x", pady=(0, 18))
