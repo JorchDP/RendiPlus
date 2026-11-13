@@ -435,8 +435,8 @@ def analizar(datos_pc, uso=None):
     if uso.get("ram", 0) >= 85:
         agregar("media", "Memoria", f"La RAM está al {uso['ram']:.0f} % ahora mismo",
                 "Cuando se llena, Windows usa el disco como memoria y todo se pone lento. "
-                "Cierra las apps que no estés usando.",
-                {"tipo": "pagina", "pagina": "inicio", "texto": "Ver procesos"})
+                "Libera memoria o cierra las apps que no estés usando.",
+                {"tipo": "pagina", "pagina": "memoria", "texto": "Liberar memoria"})
 
     # --- 9. Seguridad ---
     try:

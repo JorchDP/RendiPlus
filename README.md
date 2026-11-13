@@ -46,6 +46,7 @@ Usa el botón **Abrir como administrador** del menú lateral.
 |---|---|
 | Panel | Uso en vivo de CPU, RAM y GPU, puntaje de salud, discos y especificaciones |
 | Limpieza | Temporales, cachés de navegadores y apps, papelera, Windows Update, archivos grandes |
+| Memoria RAM | Libera la RAM que las apps no usan (a mano o sola al pasar un límite), muestra qué la ocupa y mantiene cerradas las apps que se abren solas |
 | Programas y discos | Qué hay instalado en cada disco y cuánto ocupa (programas, Steam, Epic, Xbox). Desinstala con el desinstalador oficial de cada uno |
 | Inicio y procesos | Activa o desactiva programas que arrancan solos; cierra apps pesadas |
 | Perfiles | Rendimiento, Equilibrado y Ahorro: plan de energía, modo de juego, transparencias y apps en segundo plano |
@@ -73,6 +74,7 @@ RendiPlus/
 │   ├── inicio.py           Programas de inicio y procesos
 │   ├── perfiles.py         Perfiles y ajustes de Windows / Mac
 │   ├── recomendaciones.py  Reglas, puntaje de salud y calidad gráfica sugerida
+│   ├── memoria.py          Liberar RAM, liberación automática y apps que se mantienen cerradas
 │   ├── mejoras.py          Equilibrio del equipo y mejoras de hardware compatibles
 │   ├── programas.py        Programas y juegos instalados por disco, tamaño y desinstalación
 │   ├── seguridad.py        Microsoft Defender, firewall y protección de macOS

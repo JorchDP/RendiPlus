@@ -362,7 +362,7 @@ def cerrar_proceso(nombre):
     fallidos = 0
     victimas = []
     for proceso in psutil.process_iter(["name"]):
-        if proceso.info["name"] == nombre and proceso.pid not in (propio, padre):
+        if (proceso.info["name"] or "").lower() == nombre.lower() and proceso.pid not in (propio, padre):
             try:
                 proceso.terminate()
                 victimas.append(proceso)

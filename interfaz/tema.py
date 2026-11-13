@@ -15,7 +15,7 @@ import customtkinter as ctk
 from motores.sistema import leer_config
 
 NOMBRE_APP = "RendiPlus"
-VERSION = "1.2"
+VERSION = "1.3"
 
 # ============================================================
 #  Temas de color. El elegido se guarda en la configuración y se aplica al abrir la app.

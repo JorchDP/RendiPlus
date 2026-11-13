@@ -102,8 +102,12 @@ def construir(marco, app):
                                anchor="e", width=70)
         memoria.pack(side="right")
         filas_apps.append((nombre, memoria))
-    tema.boton(apps, "Administrar procesos", lambda: app["ir_a"]("inicio"), "fantasma",
-               alto=32).pack(anchor="w", padx=12, pady=(6, 14))
+    enlaces_apps = ctk.CTkFrame(apps, fg_color="transparent", height=1)
+    enlaces_apps.pack(anchor="w", padx=12, pady=(6, 14))
+    tema.boton(enlaces_apps, "Liberar memoria", lambda: app["ir_a"]("memoria"), "fantasma",
+               alto=32).pack(side="left")
+    tema.boton(enlaces_apps, "Administrar procesos", lambda: app["ir_a"]("inicio"), "fantasma",
+               alto=32).pack(side="left", padx=(6, 0))
 
     # ------------------------------------------------------------
     #  Almacenamiento

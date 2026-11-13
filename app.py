@@ -15,7 +15,7 @@ import traceback
 
 import customtkinter as ctk
 
-from motores import escritorio, hardware, perfiles, recomendaciones, sistema, historial
+from motores import escritorio, hardware, memoria, perfiles, recomendaciones, sistema, historial
 
 # ============================================================
 #  Una sola RendiPlus abierta a la vez
@@ -28,7 +28,7 @@ if not escritorio.instancia_unica(lambda: cola.put(("mostrar", None))):
     sys.exit(0)   # ya estaba abierta: le pedimos que se muestre y salimos
 
 from interfaz import tema  # noqa: E402  (se importa después: lee el tema guardado)
-from interfaz import (pagina_panel, pagina_limpieza, pagina_programas, pagina_inicio,  # noqa: E402
+from interfaz import (pagina_panel, pagina_limpieza, pagina_memoria, pagina_programas, pagina_inicio,  # noqa: E402
                       pagina_perfiles, pagina_seguridad, pagina_recomendaciones, pagina_mejoras,
                       pagina_historial, pagina_configuracion)
 
@@ -157,6 +157,7 @@ ctk.CTkLabel(nombre_marca, text="Optimizador de PC", font=tema.fuente(11),
 PAGINAS = [
     ("panel", "Panel", pagina_panel),
     ("limpieza", "Limpieza", pagina_limpieza),
+    ("memoria", "Memoria RAM", pagina_memoria),
     ("programas", "Programas y discos", pagina_programas),
     ("inicio", "Inicio y procesos", pagina_inicio),
     ("perfiles", "Perfiles", pagina_perfiles),
@@ -173,12 +174,12 @@ paginas_creadas = {}
 def crear_item_menu(clave, texto):
     if clave == "configuracion":
         tema.separador(lateral).pack(fill="x", padx=24, pady=10)
-    fila = ctk.CTkFrame(lateral, fg_color="transparent", height=38)
+    fila = ctk.CTkFrame(lateral, fg_color="transparent", height=36)
     fila.pack(fill="x", padx=(10, 14), pady=1)
     indicador = ctk.CTkFrame(fila, width=3, height=22, fg_color=tema.LATERAL, corner_radius=2)
     indicador.pack(side="left", padx=(0, 7))
     boton = ctk.CTkButton(
-        fila, text=texto, anchor="w", height=36, corner_radius=8, fg_color="transparent",
+        fila, text=texto, anchor="w", height=34, corner_radius=8, fg_color="transparent",
         hover_color=tema.SUPERFICIE, text_color=tema.TEXTO_SUAVE, font=tema.fuente(14),
         command=lambda: ir_a(clave),
     )
@@ -425,6 +426,8 @@ def procesar_cola():
             aparecer()
         elif pedido == "perfil":
             aplicar_perfil(dato)
+        elif pedido == "aviso":
+            notificar(dato, tema.ACERO)
         elif pedido == "salir":
             salir()
             return
@@ -500,6 +503,8 @@ en_segundo_plano(hardware.iniciar_nvidia, lambda lista: emitir("gpu_lista") if l
 tic()
 en_segundo_plano(hardware.info_completa, datos_listos)
 procesar_cola()
+# Libera RAM sola y mantiene cerradas las apps de la lista (si el usuario lo activó)
+memoria.Vigilante(lambda texto: cola.put(("aviso", texto))).iniciar()
 
 def iniciar_oculta():
     app["oculta"] = True
